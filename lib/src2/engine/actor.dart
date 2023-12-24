@@ -3,11 +3,10 @@ import '../components/components.dart';
 import 'tile.dart'; // Your Tile class
 import 'game.dart';
 
-
 class Actor {
   final Game game; // Reference to the game object
   Vec pos; // Position in the game world
-  List<Component<Actor>> components = []; // Components attached to this actor
+  Map<Type, Component<Actor>> components = {}; // Components attached to this actor
 
   int _health; // Private health property
   int maxHealth; // Maximum health for the actor
@@ -17,17 +16,22 @@ class Actor {
 
   // Add a component to this actor
   void addComponent(Component<Actor> component) {
-    components.add(component);
+    components[component.runtimeType] = component;
+  }
+
+  // Get a specific type of component from this actor
+  T? getComponent<T extends Component<dynamic>>({T? defaultValue}) {
+    return components[T] as T? ?? defaultValue;
   }
 
   // Remove a specific type of component from this actor
   void removeComponent<T extends Component<Actor>>() {
-    components.removeWhere((c) => c is T);
+    components.remove(T);
   }
 
   // Update all components (called every game tick or when needed)
   void update() {
-    for (var component in components) {
+    for (var component in components.values) {
       component.update();
     }
   }
@@ -47,32 +51,31 @@ class Actor {
   }
 
   bool isAlive() {
-    // Check if the actor has a HealthComponent
-    bool hasHealthComponent = components.any((component) => component is HealthComponent);
+  // Attempt to get the HealthComponent
+  var healthComponent = getComponent<HealthComponent>();
 
-    // If it doesn't have a HealthComponent, it's not considered alive
-    if (!hasHealthComponent) {
-      return false;
-    }
-
-    // If it does have a HealthComponent, check if its health is above 0
-    HealthComponent healthComponent = components.firstWhere((c) => c is HealthComponent) as HealthComponent;
+  // Check if the health component exists and has health greater than 0
+  if (healthComponent != null) {
     return healthComponent.health > 0;
   }
 
-  // Method to handle actor movement
- bool tryMove(Vec to) {
-  Tile fromTile = game.getTileAt(pos); // Tile the actor is currently on
-  Tile toTile = game.getTileAt(to); // Destination tile
-  
-  if (toTile.isWalkable && !toTile.isOccupied) {
-    fromTile.removeActor(this); // Leave the current tile
-    toTile.addActor(this); // Enter the new tile
-    pos = to; // Update position
-    return true; // Move succeeded
-  }
-  return false; // Move failed
+  // If no HealthComponent or health is null, return false
+  return false;
 }
+
+  // Method to handle actor movement
+  bool tryMove(Vec to) {
+    Tile fromTile = game.getTileAt(pos); // Tile the actor is currently on
+    Tile toTile = game.getTileAt(to); // Destination tile
+  
+    if (toTile.isWalkable && !toTile.isOccupied) {
+      fromTile.removeActor(this); // Leave the current tile
+      toTile.addActor(this); // Enter the new tile
+      pos = to; // Update position
+      return true; // Move succeeded
+    }
+    return false; // Move failed
+  }
 
   // ... Additional methods for combat, interaction, etc.
 }

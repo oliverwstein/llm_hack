@@ -3,23 +3,27 @@ import 'package:piecemeal/piecemeal.dart';
 import 'actor.dart';
 
 class Tile {
-  List<Component<Tile>> components = [];
+  Map<Type, Component<Tile>> components = {};
   List<Actor> actors = []; // Actors currently on this tile
 
+  // Add a component to this tile
   void addComponent(Component<Tile> component) {
-    components.add(component);
+    components[component.runtimeType] = component;
   }
 
-  T getComponent<T extends Component<Tile>>() {
-    return components.firstWhere((c) => c is T) as T;
+  // Get a specific type of component from this tile
+  T? getComponent<T extends Component<dynamic>>({T? defaultValue}) {
+    return components[T] as T? ?? defaultValue;
   }
 
+  // Remove a specific type of component from this tile
   void removeComponent<T extends Component<Tile>>() {
-    components.removeWhere((c) => c is T);
+    components.remove(T);
   }
 
+  // Update all components
   void update() {
-    for (var component in components) {
+    for (var component in components.values) {
       component.update();
     }
   }
@@ -39,9 +43,8 @@ class Tile {
     return actors.isNotEmpty;
   }
 
-  // Utility methods to check for walkability and transparency
+  // Check for walkability based on the presence of a WalkableComponent
   bool get isWalkable {
-    return components.any((component) => component is WalkableComponent);
+    return components.containsKey(WalkableComponent);
   }
-
 }
