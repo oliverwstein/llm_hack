@@ -288,6 +288,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.2"
+  piecemeal:
+    dependency: "direct main"
+    description:
+      name: piecemeal
+      sha256: "1c57c8f3a4955065d5baf32d2b4d6d6d26f40018abee162932ed8cd230d6b6fc"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   rfc_6901:
     dependency: transitive
     description:
