@@ -1,19 +1,34 @@
 import 'component.dart';
-abstract class Renderable {
-  RenderComponent get renderComponent;
-}
 
-class RenderComponent extends Component<Renderable> {
-  String appearance;
-  int layer;
+import '../engine/tile.dart';
+import '../engine/actor.dart'; // Assuming Tile class is defined
 
-  RenderComponent(Renderable parent, this.appearance, this.layer) : super(parent);
+class RenderTile extends Component<Tile> {
+  String appearance; // Visual representation
+  int layer; // Rendering layer
+
+  RenderTile(Tile parent, this.appearance, this.layer) : super(parent);
 
   @override
   void update({String? newAppearance}) {
     if (newAppearance != null) {
-      appearance = newAppearance;
+      appearance = newAppearance; // Update appearance if new character is given
     }
-    // Include other update logic here as needed
+    // Do nothing if no new character is provided
+  }
+}
+
+class RenderActor extends Component<Actor> {
+  String appearance; // Visual representation
+  int layer; // Rendering layer
+
+  RenderActor(Actor parent, this.appearance, this.layer) : super(parent);
+
+  @override
+  void update({String? newAppearance}) {
+    if (newAppearance != null) {
+      appearance = newAppearance; // Update appearance if new character is given
+    }
+    // Do nothing if no new character is provided
   }
 }

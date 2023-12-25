@@ -13,7 +13,7 @@ class DoorComponent extends Component<Tile> {
     String newAppearance = isOpen ? 'openDoor' : 'closedDoor';
 
     // Retrieve the RenderComponent and update its appearance
-    var renderComponent = parent.getComponent<RenderComponent>();
+    var renderComponent = parent.getComponent<RenderTile>();
     renderComponent?.update(newAppearance: newAppearance);
 
     // Handle walkability logic as before...

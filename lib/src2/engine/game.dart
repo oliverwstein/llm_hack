@@ -1,17 +1,20 @@
 // Assuming Actor.dart and Tile.dart are imported
 import 'actor.dart';
 import 'tile.dart';
+import 'stage.dart';
 import 'package:piecemeal/piecemeal.dart';
 
 class Game {
-  Array2D<Stage> stage; // The grid representing the game world
+  late Stage stage; // Declare stage, but initialize it later
   List<Actor> actors; // All actors in the game
   Actor? player; // The player actor, if any
 
   bool isRunning;
 
   // Constructor
-  Game() : stage = stage, actors = [], isRunning = true {
+  Game() : actors = [], isRunning = true {
+    // Initialize the stage within the constructor body
+    stage = Stage(10, 10, this); // 'this' is valid here
     initializeWorld();
   }
 
@@ -45,26 +48,21 @@ class Game {
     for (Actor actor in actors) {
       actor.update(); // Update each actor
     }
-    for (List<Tile> row in stage) {
-      for (Tile tile in row) {
-        tile.update(); // Update each tile
-      }
+    for (Tile tile in stage.tiles) {
+      tile.update(); // Directly iterate over individual tiles
     }
   }
 
   // Method to get a tile at a specified position
   Tile getTileAt(Vec pos) {
-    int x = pos.x;
-    int y = pos.y;
-
-    // Check if the coordinates are within the bounds of the game world
-    if (y >= 0 && y < stage.length && x >= 0 && x < stage[y].length) {
-      return stage[y][x];
-    } else {
-      // Position is out of bounds or no tile exists at the position
-      return stage[0][0]; // Return null or handle it as you see fit
-    }
+  // Check if the coordinates are within the bounds of the stage
+  if (stage.bounds.contains(pos)) {
+    return stage.tiles[pos]; // Directly access the tile using Array2D's indexing
+  } else {
+    // Position is out of bounds
+    throw RangeError('Position is out of stage bounds.'); // Or handle it as you see fit
   }
+}
 
   // Stub method for handling input
   void handleInput() {
