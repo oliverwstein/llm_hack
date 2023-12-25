@@ -2,6 +2,7 @@ import 'package:piecemeal/piecemeal.dart';
 import 'game.dart';
 import 'tile.dart';
 import 'actor.dart';
+import 'stage_builder.dart';
 
 class Stage {
   final Game game;
@@ -12,7 +13,13 @@ class Stage {
 
   Stage(int width, int height, this.game)
       : tiles = Array2D.generated(width, height, (_) => Tile()),
-        _actorsByTile = Array2D(width, height, null);
+        _actorsByTile = Array2D(width, height, null){
+
+        // Initialize the StageBuilder with this Stage instance
+        StageBuilder builder = StageBuilder(this);
+        // Use the builder to set up the stage's tiles
+        builder.buildSimpleLayout();
+        }
 
   // Stage properties getters
   int get width => tiles.width;
