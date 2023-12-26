@@ -58,27 +58,33 @@ class StageTextWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Convert the entire stage into a single string representation
-    String stageRepresentation = '';
-    for (int y = 0; y < stage.height; y++) {
-      for (int x = 0; x < stage.width; x++) {
+    double tileSize = 12; // Size of each tile square
+
+    return GridView.builder(
+      physics: NeverScrollableScrollPhysics(), // Disable GridView's own scrolling
+      shrinkWrap: true, // Fit the content in the visible area
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: stage.width, // Number of tiles across the stage width
+        childAspectRatio: 1, // Aspect ratio for each item is 1 (square)
+      ),
+      itemCount: stage.width * stage.height, // Total number of tiles
+      itemBuilder: (context, index) {
+        final x = index % stage.width;
+        final y = index ~/ stage.width;
         final tile = stage.getTile(Vec(x, y));
         var renderComponent = tile.getComponent<RenderTile>();
-        stageRepresentation += renderComponent!.appearance; // Assuming a method to get appearance
-      }
-      if (y < stage.height - 1) stageRepresentation += '\n'; // New line for each row except the last
-    }
 
-    // Using a monospaced font to ensure alignment
-    return SingleChildScrollView(
-      child: Text(
-        stageRepresentation,
-        style: TextStyle(
-          fontFamily: 'Courier', // Consider a monospaced font
-          fontSize: 14,
-        ),
-        textAlign: TextAlign.left,
-      ),
+        return Container(
+          width: tileSize,
+          height: tileSize,
+          alignment: Alignment.center,
+          child: Text(
+            renderComponent!.appearance,
+            style: TextStyle(fontFamily: 'Courier', fontSize: tileSize / 1.5),
+            textAlign: TextAlign.center,
+          ),
+        );
+      },
     );
   }
 }
