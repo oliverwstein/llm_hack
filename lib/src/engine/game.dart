@@ -6,27 +6,19 @@ import 'package:piecemeal/piecemeal.dart';
 
 class Game {
   late Stage stage; // Declare stage, but initialize it later
-  List<Actor> actors; // All actors in the game
   Actor? player; // The player actor, if any
 
   bool isRunning;
 
   // Constructor
-  Game() : actors = [], isRunning = true {
-    // Initialize the stage within the constructor body
-    stage = Stage(10, 10, this); // 'this' is valid here
+  Game() : isRunning = true {
     initializeWorld();
   }
 
   // Initialize or load the game world
   void initializeWorld() {
-    // Load or create tiles and place actors
-    // ... existing initialization code
-
-    // Initialize the player, if necessary, and other actors
-    // player = Actor(this, Vec(5, 5), 100, 100); // Example initialization
-    // actors.add(player); // Add player to actors list if there is one
-    // Add other actors as needed
+    // Initialize the stage within the constructor body
+    stage = Stage(40, 40, this);
   }
 
   // The main game loop
@@ -36,8 +28,7 @@ class Game {
       handleInput(); // Method to handle player input and possibly AI
       checkEndConditions(); // Check if the game should end
       
-      // Additional check to avoid tight loop in case there is no player or actors
-      if (actors.isEmpty) {
+      if (stage.actors.isEmpty && stage.tiles.isEmpty) {
         isRunning = false;
       }
     }
@@ -45,7 +36,7 @@ class Game {
 
   // Update the game state
   void update() {
-    for (Actor actor in actors) {
+    for (Actor actor in stage.actors) {
       actor.update(); // Update each actor
     }
     for (Tile tile in stage.tiles) {
