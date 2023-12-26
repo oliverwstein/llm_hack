@@ -56,8 +56,9 @@ class StageBuilder {
 
   // Carve out the room by replacing wall tiles with floor tiles
   void carveRoom(Room room) {
-    for (int y = room.y; y < room.y + room.height; y++) {
-      for (int x = room.x; x < room.x + room.width; x++) {
+    // Loop starts from 1 tile inward and ends 1 tile before the actual edge
+    for (int y = room.y + 1; y < room.y + room.height - 1; y++) {
+      for (int x = room.x + 1; x < room.x + room.width - 1; x++) {
         Tile tile = stage.getTile(Vec(x, y));
         // Replace wall with floor appearance and make it walkable
         tile.removeComponent<RenderTile>(); // Remove the wall component first
@@ -65,7 +66,7 @@ class StageBuilder {
         tile.addComponent(WalkableComponent(tile));
       }
     }
-    // Update room walls and other features as needed
+    // Edge tiles remain walls, inner tiles become floors
   }
 
   // Generate a random room within the stage constraints
@@ -73,8 +74,8 @@ class StageBuilder {
     int maxWidth = (stage.width / 3).floor();
     int maxHeight = (stage.height / 3).floor();
 
-    int width = rand.nextInt(maxWidth - 2) + 3; // Ensure room is at least 3 wide
-    int height = rand.nextInt(maxHeight - 2) + 3; // Ensure room is at least 3 tall
+    int width = rand.nextInt(maxWidth - 2) + 4; // Ensure room is at least 4 wide
+    int height = rand.nextInt(maxHeight - 2) + 4; // Ensure room is at least 4 tall
     int x = rand.nextInt(stage.width - width);
     int y = rand.nextInt(stage.height - height);
 
