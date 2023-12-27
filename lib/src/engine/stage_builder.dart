@@ -12,12 +12,16 @@ class StageBuilder {
   final List<Room> rooms = []; // Keep track of rooms on the stage
   Random rand = Random();
   int _currentRegion = 0;
+  late Array2D<int> _regions;
+  
 
   StageBuilder(this.stage) {
     fillWithStone(); // Fill the stage with stone walls initially
-    int numRoomTries = 100; // Number of attempts to place rooms, adjust as needed
+    int numRoomTries = 1000; // Number of attempts to place rooms, adjust as needed
+    _regions = Array2D(stage.width, stage.height, _currentRegion);
     addRandomRooms(numRoomTries);
-    makeMaze(50);
+    makeMaze(75);
+    // connectRegions();
   }
 
   void buildSimpleLayout() {
@@ -43,6 +47,7 @@ class StageBuilder {
       for (int x = 0; x < stage.width; x++) {
         Tile tile = stage.getTile(Vec(x, y));
         // Assign wall appearance to all tiles initially
+        tile.addComponent(StoneComponent(tile));
         tile.addComponent(RenderTile(tile, tileAppearances['stone']!, 0));
       }
     }
@@ -71,10 +76,12 @@ class StageBuilder {
 
         if (isEdge) {
           tile.removeComponent<RenderTile>();
+          tile.addComponent(WallComponent(tile));
           tile.addComponent(RenderTile(tile, tileAppearances['wall']!, 0)); // Add wall component
         } else {
           // This is an inner tile, so carve it as floor
           tile.removeComponent<RenderTile>();
+          tile.removeComponent<StoneComponent>();
           tile.addComponent(RenderTile(tile, tileAppearances['floor']!, 0)); // Add floor component
           tile.addComponent(WalkableComponent(tile)); // Make the tile walkable
         }
@@ -105,31 +112,21 @@ class StageBuilder {
     return false;
   }
 
-  // Place the room on the stage
-  void placeRoom(Room room) {
-    for (int y = room.y; y < room.y + room.height; y++) {
-      for (int x = room.x; x < room.x + room.width; x++) {
-        Tile tile = stage.getTile(Vec(x, y));
-        // Assign floor appearance and make it walkable
-        tile.addComponent(RenderTile(tile, tileAppearances['floor']!, 0));
-        tile.addComponent(WalkableComponent(tile));
-      }
-    }
-  }
-
   void makeMaze(int windingPercent) {
     // Fill in all of the empty space with mazes.
     for (var y = 1; y < stage.height; y += 2) {
         for (var x = 1; x < stage.width; x += 2) {
             var pos = Vec(x, y);
             var tile = stage.getTile(pos);
-            var renderTile = tile.getComponent<RenderTile>();
+            var stoneComponent = tile.getComponent<StoneComponent>();
+            var wallComponent = tile.getComponent<WallComponent>();
             
-            if (renderTile?.appearance != tileAppearances['stone']!) continue;
-            _growMaze(pos, 50);
+            if (stoneComponent != null && wallComponent == null) {
+                _growMaze(pos, windingPercent);
+            }
         }
     }
-  }
+}
 
   void _growMaze(Vec start, int windingPercent) {
     var cells = <Vec>[];
@@ -183,7 +180,7 @@ class StageBuilder {
 
   // Check the cell two steps ahead in the same direction to prevent carving into adjacent passages
   Vec ahead = Vec(newPos.x + dir.x, newPos.y + dir.y);
-  if (!_isInBounds(ahead) || !_isStone(ahead)) return false;
+  if (!_isInBounds(ahead) || !_isStone(ahead) || _isWall(ahead)) return false;
 
   // Check if the new position is currently a wall and can be carved
   return _isStone(newPos);
@@ -195,23 +192,81 @@ bool _isInBounds(Vec pos) {
 }
 
 bool _isStone(Vec pos) {
-  // Check if the tile at the given position is a wall, by checking its appearance or type
   Tile tile = stage.getTile(pos);
-  var renderTile = tile.getComponent<RenderTile>(); // Assuming getComponent method is available
-  return renderTile?.appearance == tileAppearances['stone']!; // Wall character
+  var stoneComponent = tile.getComponent<StoneComponent>();
+  return stoneComponent != null;
 }
 
-
+bool _isWall(Vec pos) {
+  Tile tile = stage.getTile(pos);
+  var wallComponent = tile.getComponent<WallComponent>();
+  return wallComponent != null;
+}
   void _carve(Vec pos) {
-  var tile = stage.getTile(pos);
-  tile.removeComponent<RenderTile>(); // Remove the wall component
-  tile.addComponent(RenderTile(tile, tileAppearances['floor']!, 0)); // Add floor component
-  tile.addComponent(WalkableComponent(tile)); // Make it walkable
-}
+      var tile = stage.getTile(pos);
+      tile.removeComponent<RenderTile>();
+      tile.removeComponent<StoneComponent>();
+      tile.addComponent(RenderTile(tile, tileAppearances['corridor']!, 0));
+      tile.addComponent(WalkableComponent(tile)); // Make it walkable
+      _regions[pos] = _currentRegion;
+  }
 
   void _startRegion() {
     _currentRegion++; // Increment to signify a new region
     // Additional logic to mark the start of a new region...
+  }
+
+  void connectRegions() {
+    // Identify all potential connectors
+    List<Vec> connectors = [];
+    for (int y = 1; y < stage.height - 1; y++) {
+      for (int x = 1; x < stage.width - 1; x++) {
+        Vec pos = Vec(x, y);
+        if (_isPotentialConnector(pos)) {
+          connectors.add(pos);
+        }
+      }
+    }
+
+    // Continue until all connectors are processed or no connectors left
+    while (connectors.isNotEmpty) {
+      // Randomly select a connector and carve a passage
+      int index = rand.nextInt(connectors.length);
+      Vec connector = connectors[index];
+      connectors.removeAt(index); // Remove the selected connector
+
+      // Open the connector (carve a passage)
+      Tile tile = stage.getTile(connector);
+      tile.removeComponent<RenderTile>();
+      tile.removeComponent<WallComponent>();
+      tile.addComponent(RenderTile(tile, tileAppearances['door']!, 0)); // Assuming door is a connector
+      tile.addComponent(WalkableComponent(tile));
+      tile.addComponent(DoorComponent(tile));
+
+      // Remove any extraneous connectors
+      connectors.removeWhere((Vec other) => _isRedundantConnector(other, connector));
+    }
+  }
+
+  bool _isPotentialConnector(Vec pos) {
+    if (!_isWall(pos)) return false;
+    Tile tile = stage.getTile(pos);
+    int adjacentRegions = 0;
+    for (var dir in Direction.cardinal) {
+      Vec adjacentPos = Vec(pos.x + dir.x, pos.y + dir.y);
+      if (_isInBounds(adjacentPos)) {
+          if (!_isStone(adjacentPos)) {
+            adjacentRegions++;
+          }
+      }
+    }
+    return adjacentRegions >= 2; // Ensure it's adjacent to two different regions
+  }
+
+  bool _isRedundantConnector(Vec pos, Vec openedConnector) {
+    // A connector is redundant if it no longer separates two regions
+    // For simplicity, assume a connector is redundant if it's adjacent to an opened connector
+    return (pos - openedConnector).kingLength == 1;
   }
 
 
