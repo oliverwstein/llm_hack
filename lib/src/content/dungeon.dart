@@ -112,14 +112,16 @@ class Dungeon extends StageBuilder {
         // If they are in different sets, no cycle will be formed
         if (set1 != set2) {
             // Add this edge to the MST
-            _carve(connector, 'door', true);  // Convert the connector to a passage
+            _carve(connector, 'door', false);  // Convert the connector to a passage
+            stage.getTile(connector).addComponent(DoorComponent(stage.getTile(connector)));
 
             // Merge the sets
             forest.union(set1, set2);
         }
         // Optionally, add extra doors or passages
         if (rng.oneIn(50)) {
-            _carve(connector, 'door', true);
+            _carve(connector, 'door', false);
+            stage.getTile(connector).addComponent(DoorComponent(stage.getTile(connector)));
         }
     }
 }
