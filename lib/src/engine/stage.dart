@@ -3,6 +3,7 @@ import 'game.dart';
 import 'tile.dart';
 import 'actor.dart';
 import 'stage_builder.dart';
+import '../content/dungeon.dart';
 
 class Stage {
   final Game game;
@@ -16,7 +17,8 @@ class Stage {
         _actorsByTile = Array2D(width, height, null){
 
         // Initialize the StageBuilder with this Stage instance
-        StageBuilder builder = StageBuilder(this);
+        StageBuilder builder = Dungeon(this); 
+        builder.buildStage();
         // Use the builder to set up the stage's tiles
         }
 

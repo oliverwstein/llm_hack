@@ -2,7 +2,7 @@ const Map<String, String> tileAppearances = {
   'wall': '▒',
   'floor': '□',
   'stone': '█',
-  'corridor': '▢',
+  'corridor': '#',
   'door': 'X',
   // Add more tile types and appearances as needed
 };

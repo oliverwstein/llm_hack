@@ -85,7 +85,7 @@ class StageTextWidget extends StatelessWidget {
           alignment: Alignment.center,
           child: Text(
             renderComponent!.appearance,
-            style: TextStyle(fontFamily: 'Courier', fontSize: tileSize / 1.5),
+            style: TextStyle(fontFamily: 'Courier', fontSize: tileSize),
             textAlign: TextAlign.center,
           ),
         );
