@@ -17,7 +17,7 @@ class StageBuilder {
     fillWithStone(); // Fill the stage with stone walls initially
     int numRoomTries = 100; // Number of attempts to place rooms, adjust as needed
     addRandomRooms(numRoomTries);
-    // makeMaze(50);
+    makeMaze(50);
   }
 
   void buildSimpleLayout() {
@@ -183,10 +183,10 @@ class StageBuilder {
 
   // Check the cell two steps ahead in the same direction to prevent carving into adjacent passages
   Vec ahead = Vec(newPos.x + dir.x, newPos.y + dir.y);
-  if (!_isInBounds(ahead) || !_isWall(ahead)) return false;
+  if (!_isInBounds(ahead) || !_isStone(ahead)) return false;
 
   // Check if the new position is currently a wall and can be carved
-  return _isWall(newPos);
+  return _isStone(newPos);
 }
 
 bool _isInBounds(Vec pos) {
@@ -194,11 +194,11 @@ bool _isInBounds(Vec pos) {
   return pos.x >= 0 && pos.x < stage.width && pos.y >= 0 && pos.y < stage.height;
 }
 
-bool _isWall(Vec pos) {
+bool _isStone(Vec pos) {
   // Check if the tile at the given position is a wall, by checking its appearance or type
   Tile tile = stage.getTile(pos);
   var renderTile = tile.getComponent<RenderTile>(); // Assuming getComponent method is available
-  return renderTile?.appearance == tileAppearances['wall']!; // Wall character
+  return renderTile?.appearance == tileAppearances['stone']!; // Wall character
 }
 
 
