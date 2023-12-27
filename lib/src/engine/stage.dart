@@ -18,7 +18,6 @@ class Stage {
         // Initialize the StageBuilder with this Stage instance
         StageBuilder builder = StageBuilder(this);
         // Use the builder to set up the stage's tiles
-        builder.buildSimpleLayout();
         }
 
   // Stage properties getters
