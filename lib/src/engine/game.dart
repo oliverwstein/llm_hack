@@ -18,7 +18,7 @@ class Game {
   // Initialize or load the game world
   void initializeWorld() {
     // Initialize the stage within the constructor body
-    stage = Stage(80, 30, this);
+    stage = Stage(51, 31, this);
   }
 
   // The main game loop

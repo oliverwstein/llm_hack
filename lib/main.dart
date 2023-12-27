@@ -3,9 +3,14 @@ import 'package:piecemeal/piecemeal.dart';
 import 'src/engine/game.dart';
 import 'src/engine/stage.dart';
 import 'src/app.dart';
+import 'src/settings/settings_controller.dart';
+import 'src/settings/settings_service.dart';
 import 'src/components/render.dart';
 
-void main() {
+void main()  async {
+  final settingsController = SettingsController(SettingsService());
+  await settingsController.loadSettings();
+  runApp(MyApp(settingsController: settingsController));
   runApp(RoguelikeApp());
 }
 
@@ -80,7 +85,7 @@ class StageTextWidget extends StatelessWidget {
           alignment: Alignment.center,
           child: Text(
             renderComponent!.appearance,
-            style: TextStyle(fontFamily: 'Courier', fontSize: tileSize / 1.5),
+            style: TextStyle(fontFamily: 'Courier', fontSize: tileSize),
             textAlign: TextAlign.center,
           ),
         );
