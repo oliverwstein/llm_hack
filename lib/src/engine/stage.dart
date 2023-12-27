@@ -18,8 +18,6 @@ class Stage {
         // Initialize the StageBuilder with this Stage instance
         StageBuilder builder = StageBuilder(this);
         // Use the builder to set up the stage's tiles
-        int numRoomTries = 30; // Number of attempts to place rooms, adjust as needed
-        builder.addRandomRooms(numRoomTries);
         }
 
   // Stage properties getters
