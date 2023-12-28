@@ -11,10 +11,12 @@ void main()  async {
   final settingsController = SettingsController(SettingsService());
   await settingsController.loadSettings();
   runApp(MyApp(settingsController: settingsController));
-  runApp(RoguelikeApp());
+  runApp(const RoguelikeApp());
 }
 
 class RoguelikeApp extends StatelessWidget {
+  const RoguelikeApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -22,12 +24,14 @@ class RoguelikeApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: GameScreen(),
+      home: const GameScreen(),
     );
   }
 }
 
 class GameScreen extends StatefulWidget {
+  const GameScreen({super.key});
+
   @override
   _GameScreenState createState() => _GameScreenState();
 }
@@ -39,7 +43,7 @@ class _GameScreenState extends State<GameScreen> {
   void initState() {
     super.initState();
     game = Game(); // Initialize the game
-    game.initializeWorld(); // Setup the world or stage
+    game.run();
     // Consider running game loop updates in an isolate or async function
   }
 
@@ -47,7 +51,7 @@ class _GameScreenState extends State<GameScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('LLM Hack'),
+        title: const Text('LLM Hack'),
       ),
       body: Center(
         child: StageTextWidget(stage: game.stage), // Custom widget to render the game stage as text
@@ -59,14 +63,14 @@ class _GameScreenState extends State<GameScreen> {
 class StageTextWidget extends StatelessWidget {
   final Stage stage;
 
-  StageTextWidget({required this.stage});
+  const StageTextWidget({super.key, required this.stage});
 
   @override
   Widget build(BuildContext context) {
     double tileSize = 12; // Size of each tile square
 
     return GridView.builder(
-      physics: NeverScrollableScrollPhysics(), // Disable GridView's own scrolling
+      physics: const NeverScrollableScrollPhysics(), // Disable GridView's own scrolling
       shrinkWrap: true, // Fit the content in the visible area
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: stage.width, // Number of tiles across the stage width

@@ -1,5 +1,6 @@
 // Assuming Actor.dart and Tile.dart are imported
 import 'actor.dart';
+import 'event.dart';
 import 'tile.dart';
 import 'stage.dart';
 import 'package:piecemeal/piecemeal.dart';
@@ -11,9 +12,7 @@ class Game {
   bool isRunning;
 
   // Constructor
-  Game() : isRunning = true {
-    initializeWorld();
-  }
+  Game() : isRunning = true;
 
   // Initialize or load the game world
   void initializeWorld() {
@@ -23,11 +22,12 @@ class Game {
 
   // The main game loop
   void run() {
+    initializeWorld();
     while (isRunning) { // Continue while the game is active
       update();
       handleInput(); // Method to handle player input and possibly AI
       checkEndConditions(); // Check if the game should end
-      
+      isRunning = false;
       if (stage.actors.isEmpty && stage.tiles.isEmpty) {
         isRunning = false;
       }
@@ -74,3 +74,23 @@ class Game {
     // }
   }
 }
+
+/// Each call to [Game.update()] will return a [GameResult] object that tells
+  /// the UI what happened during that update and what it needs to do.
+  class GameResult {
+    /// The "interesting" events that occurred in this update.
+    final List<Event> events;
+
+    /// Whether or not any game state has changed. If this is `false`, then no
+    /// game processing has occurred (i.e. the game is stuck waiting for user
+    /// input for the [Hero]).
+    bool madeProgress = false;
+
+    /// Returns `true` if the game state has progressed to the point that a change
+    /// should be shown to the user.
+    bool get needsRefresh => madeProgress || events.isNotEmpty;
+
+    GameResult()
+    : events = <Event>[];
+  }
+

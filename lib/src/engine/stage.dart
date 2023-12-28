@@ -10,7 +10,7 @@ class Stage {
   final Array2D<Tile> tiles;
   final Array2D<Actor?> _actorsByTile;
   final List<Actor> _actors = <Actor>[];
-  int _currentActorIndex = 0;
+  final int _currentActorIndex = 0;
 
   Stage(int width, int height, this.game)
       : tiles = Array2D.generated(width, height, (_) => Tile()),

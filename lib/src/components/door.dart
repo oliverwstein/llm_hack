@@ -1,6 +1,6 @@
 import '../engine/tile.dart';
 import 'components.dart';
-import '../engine/tile.dart'; // Assuming Tile class is defined
+// Assuming Tile class is defined
 
 class DoorComponent extends Component<Tile> {
   bool isOpen;

@@ -29,7 +29,7 @@ class Dungeon extends StageBuilder {
   void makeMaze(int windingPercent) {
     for (var y = 1; y < stage.height; y += 2) {
       for (var x = 1; x < stage.width; x += 2) {
-        var pos = new Vec(x, y);
+        var pos = Vec(x, y);
         // If pos is a stone tile:
         if (stage.getTile(pos).getComponent<StoneComponent>() != null) {
           if (x < stage.width - 1 && y < stage.height - 1){

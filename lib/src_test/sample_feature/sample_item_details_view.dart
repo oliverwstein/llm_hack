@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:langchain/langchain.dart';
 import 'package:langchain_ollama/langchain_ollama.dart';
 
 class SampleItemDetailsView extends StatefulWidget {
@@ -29,7 +28,7 @@ class _SampleItemDetailsViewState extends State<SampleItemDetailsView> {
   Future<void> _generateResponse(String prompt) async {
     final res = await llm.generate(prompt);
     setState(() {
-      generatedText = res.generations.length > 0 ? res.generations.first.output : 'No output generated';
+      generatedText = res.generations.isNotEmpty ? res.generations.first.output : 'No output generated';
     });
   }
 

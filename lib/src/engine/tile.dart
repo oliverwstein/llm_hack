@@ -1,5 +1,4 @@
 import '../components/components.dart';
-import 'package:piecemeal/piecemeal.dart';
 import 'actor.dart';
 
 class Tile {
